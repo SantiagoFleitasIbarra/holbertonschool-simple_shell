@@ -13,10 +13,12 @@ void execute_command(char *command)
 		exit(EXIT_FAILURE);
 	} else if (pid == 0)
 	{
+		dup2(STDOUT_FILENO, STDERR_FILENO);
+
 		/** Proceso hijo */
-		if (execlp(command, command, NULL) == -1)
+		if (execvp(args[0], args) == -1)
 		{
-			perror("execlp");
+			perror("execvp");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -27,4 +29,22 @@ void execute_command(char *command)
 
 		waitpid(pid, &status, 0);
 	}
+}
+/**
+ * parse_command - function for splitting the command line into arguments
+ * @input: input
+ * @args: argument string
+ * @argc: argument counts
+*/
+void parse_command(char *input, char **args, int *argc)
+{
+	char *token = strtok(input, " \t\n");
+	*argc = 0;
+
+	while (token != NULL && *argc < MAX_ARGS)
+	{
+		args[(*argc)++] = token;
+		token = strtok(NULL, " \t\n");
+	}
+	args[*argc] = NULL;
 }
