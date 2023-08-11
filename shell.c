@@ -1,41 +1,78 @@
-#include "shell.h"
+# include "shell.h"
 /**
- * display_prompt - function to display the prompt
-*/
-void display_prompt(void)
-{
-	printf("$ ");
-	fflush(stdout);
-}
-/**
- * main - main function
- * Return: Always 0 (Success)
+ * main - main program entry
+ * Return: 0 Always (Success)
 */
 int main(void)
 {
-	char command[MAX_COMMAND_LENGTH + 1];
-
-	while (1)
+	if (!isatty(STDIN_FILENO))
+		handle_noninteractive_mode();
+	else
 	{
-		display_prompt();
-
-		if (fgets(command, sizeof(command), stdin) == NULL)
+		while (1)
 		{
-			if (feof(stdin))
+			char input[MAX_INPUT_SIZE];
+			char *args[MAX_INPUT_SIZE / 2 + 1];
+
+			display_prompt();
+			if (fgets(input, sizeof(input), stdin) == NULL)
 			{
 				printf("\n");
 				break;
 			}
-			else
-			{
-				perror("fgets");
-				exit(EXIT_FAILURE);
-			}
-		}
-		command[strcspn(command, "\n")] = '\0';
 
-		if (strlen(command) > 0)
-			execute_command(command);
+			input[strcspn(input, "\n")] = '\0';
+			tokenize_input(input, args);
+			if (args[0] != NULL)
+				execute_input(args);
+		}
 	}
 	return (0);
+}
+/**
+ * tokenize_input - splits an input string into tokens
+ * @input: input string
+ * @args: string arrangement
+*/
+void tokenize_input(char *input, char **args)
+{
+	char *token = strtok(input, " ");
+	int i = 0;
+
+	while (token != NULL)
+	{
+		args[i] = strdup(token);
+		i++;
+		token = strtok(NULL, " ");
+	}
+	args[i] = NULL;
+}
+/**
+ * handle_noninteractive_mode - handles command execution in non-interactive
+ * mode
+*/
+void handle_noninteractive_mode(void)
+{
+	char input[MAX_INPUT_SIZE];
+
+	while (fgets(input, sizeof(input), stdin))
+	{
+		char *args[MAX_INPUT_SIZE / 2 + 1];
+
+		input[strcspn(input, "\n")] = '\0';
+		tokenize_input(input, args);
+		if (args[0] != NULL)
+			execute_input(args);
+	}
+}
+/**
+ * is_absolute_path - checks whether a command is an absolute path or not
+ * @command: command to be executed
+ * Return: an integer value
+ * 1, means that the command is an absolute path. If it returns
+ * 0, the command is not an absolute path
+*/
+int is_absolute_path(char *command)
+{
+	return (strchr(command, '/') != NULL);
 }
