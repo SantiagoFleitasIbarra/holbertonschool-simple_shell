@@ -6,5 +6,6 @@
  */
 void handle_exit(char **args)
 {
+	(void)args;
 	exit(0);
 }
