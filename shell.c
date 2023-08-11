@@ -24,7 +24,15 @@ int main(void)
 			input[strcspn(input, "\n")] = '\0';
 			tokenize_input(input, args);
 			if (args[0] != NULL)
-				execute_input(args);
+			{
+				if (strcmp(args[0], "exit") == 0)
+				{
+					handle_exit(args);
+					break;
+				}
+				else
+					execute_input(args);
+			}
 		}
 	}
 	return (0);
