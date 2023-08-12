@@ -76,3 +76,23 @@ void handle_unsetenv(char **args)
 	if (unsetenv(args[1]) == -1)
 		fprintf(stderr, "Failed to unset environment variable: %s\n", args[1]);
 }
+/**
+ * exitt - exits the shell with or without a return of status n
+ * @arv: array of words of the entered line
+ */
+void exitt(char **arv)
+{
+	int i, n;
+
+	if (arv[1])
+	{
+		n = _atoi(arv[1]);
+		if (n <= -1)
+			n = 2;
+		free(arv);
+		exit(n);
+	}
+	for (i = 0; arv[i]; i++)
+		free(arv[i]);
+	exit(0);
+}
