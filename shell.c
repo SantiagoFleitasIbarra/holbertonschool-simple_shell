@@ -5,78 +5,69 @@
 */
 int main(void)
 {
-	char *input = NULL;
-	size_t len = 0;
+	char input[MAX_INPUT_SIZE], *tokens[MAX_TOKENS];
 
-	if (!isatty(STDIN_FILENO))
-		handle_noninteractive_mode();
-	else
+	while (1)
 	{
-		while (1)
-		{
-			char *args[MAX_INPUT_SIZE / 2 + 1];
+		int token_count = 0, i;
+		struct InternalCommand *internal_cmds = get_internal_commands();
 
-			display_prompt();
-			if (getline(&input, &len, stdin) == -1)
+		display_prompt();
+		if (fgets(input, sizeof(input), stdin) == NULL)
+		{
+			if (feof(stdin))
 			{
 				printf("\n");
 				break;
 			}
-
-			input[strcspn(input, "\n")] = '\0';
-			tokenize_input(input, args);
-			if (args[0] != NULL)
-				execute_input(args);
-			free(input);
-			input = NULL;
+			else
+				perror("fgets"), exit(EXIT_FAILURE);
 		}
+		input[strcspn(input, "\n")] = '\0';
+		if (input[0] == '\0')
+			break;
+		token_count = tokenize_input(input, tokens, MAX_TOKENS);
+		for (i = 0; internal_cmds[i].name != NULL; i++)
+		{
+			if (strcmp(tokens[0], internal_cmds[i].name) == 0)
+			{
+				internal_cmds[i].function(tokens);
+				break;
+			}
+
+		}
+		if (internal_cmds[i].name == NULL)
+			execute_command(tokens);
+		for (i = 0; i < token_count; i++)
+			free(tokens[i]);
 	}
 	return (0);
 }
 /**
- * tokenize_input - splits an input string into tokens
- * @input: input string
- * @args: string arrangement
+ * display_prompt - displays the prompt indicator in the shell interface
 */
-void tokenize_input(char *input, char **args)
+void display_prompt(void)
 {
-	char *token = strtok(input, " ");
-	int i = 0;
-
-	while (token != NULL)
-	{
-		args[i] = strdup(token);
-		i++;
-		token = strtok(NULL, " ");
-	}
-	args[i] = NULL;
+	printf("$ ");
+	fflush(stdout);
 }
 /**
- * handle_noninteractive_mode - handles command execution in non-interactive
- * mode
+ * tokenize_input - splitting the input string into tokens
+ * @input: a pointer to a string containing the user's input
+ * @tokens: this is an array of pointers to characters
+ * @max_tokens: this parameter indicates the maximum length of the token array
+ * Return: total number of tokens found
 */
-void handle_noninteractive_mode(void)
+int tokenize_input(char *input, char *tokens[], int max_tokens)
 {
-	char input[MAX_INPUT_SIZE];
+	int token_count = 0;
+	char *token = strtok(input, " \t\n");
 
-	while (fgets(input, sizeof(input), stdin))
+	while (token != NULL && token_count < max_tokens)
 	{
-		char *args[MAX_INPUT_SIZE / 2 + 1];
-
-		input[strcspn(input, "\n")] = '\0';
-		tokenize_input(input, args);
-		if (args[0] != NULL)
-			execute_input(args);
+		tokens[token_count++] = strdup(token);
+		token = strtok(NULL, " \t\n");
 	}
-}
-/**
- * is_absolute_path - checks whether a command is an absolute path or not
- * @command: command to be executed
- * Return: an integer value
- * 1, means that the command is an absolute path. If it returns
- * 0, the command is not an absolute path
-*/
-int is_absolute_path(char *command)
-{
-	return (strchr(command, '/') != NULL);
+	tokens[token_count] = NULL;
+	return (token_count);
 }
