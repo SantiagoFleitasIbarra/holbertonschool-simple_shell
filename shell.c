@@ -5,17 +5,19 @@
 */
 int main(void)
 {
+	char *input = NULL;
+	size_t len = 0;
+
 	if (!isatty(STDIN_FILENO))
 		handle_noninteractive_mode();
 	else
 	{
 		while (1)
 		{
-			char input[MAX_INPUT_SIZE];
 			char *args[MAX_INPUT_SIZE / 2 + 1];
 
 			display_prompt();
-			if (fgets(input, sizeof(input), stdin) == NULL)
+			if (getline(&input, &len, stdin) == -1)
 			{
 				printf("\n");
 				break;
@@ -25,6 +27,8 @@ int main(void)
 			tokenize_input(input, args);
 			if (args[0] != NULL)
 				execute_input(args);
+			free(input);
+			input = NULL;
 		}
 	}
 	return (0);
