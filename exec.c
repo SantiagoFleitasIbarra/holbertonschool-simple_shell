@@ -61,7 +61,7 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				fprintf(stderr, "Command not found: %s\n", args[0]);
+				fprintf(stderr, "hsh: %s No such file or directory\n", args[0]);
 		} else
 			search_and_execute(args);
 	}
@@ -104,13 +104,13 @@ void search_and_execute(char **args)
 			if (strchr(args[0], '/') != NULL)
 				fprintf(stderr, "%s: No such file or directory\n", args[0]);
 			else if (dir == NULL)
-				fprintf(stderr, "bash: %s: command not found\n", args[0]);
+				fprintf(stderr, "hsh: %s: command not found\n", args[0]);
 			else
 				fprintf(stderr, "%s: Is a directory\n", args[0]);
 		}
 	}
 	else
 	{
-		fprintf(stderr, "%s: command not found\n", args[0]);
+		fprintf(stderr, "%s: variable PATH not configured\n", args[0]);
 	}
 }
