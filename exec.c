@@ -54,7 +54,10 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				fprintf(stderr, "Command not found: %s\n", args[0]);
+			{
+				perror(args[0]);
+				exit(EXIT_FAILURE);
+			}
 		} else
 		{
 			search_and_execute(args);
