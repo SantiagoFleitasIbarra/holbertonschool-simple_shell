@@ -23,4 +23,6 @@ void handle_cd(char **args);
 void handle_help(void);
 void handle_setenv(char **args);
 void handle_unsetenv(char **args);
+void exitt(char **args);
+int _atoi(char *s);
 # endif
