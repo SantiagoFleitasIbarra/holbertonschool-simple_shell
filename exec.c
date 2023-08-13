@@ -9,7 +9,7 @@ void execute_command(char **args)
 
 	if (pid == 0)
 	{
-		execvp(args[0], args);
+		execve(args[0], args, environ);
 		perror("Error");
 		exit(EXIT_FAILURE);
 	} else if (pid > 0)
@@ -77,7 +77,6 @@ void search_and_execute(char **args)
 	{
 		char path_copy[MAX_INPUT_SIZE];
 		char *dir = strtok(path_copy, ":");
-		int found = 0;
 
 		strcpy(path_copy, path);
 		while (dir)
@@ -87,20 +86,12 @@ void search_and_execute(char **args)
 			snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
 			if (access(command_path, X_OK) == 0)
 			{
+				args[0] = command_path;
 				execute_command(args);
-				found = 1;
-				break;
+				return;
 			}
 			dir = strtok(NULL, ":");
 		}
-		if (!found)
-		{
-			if (strchr(args[0], '/') != NULL)
-				fprintf(stderr, "%s: No such file or directory\n", args[0]);
-			else if (dir == NULL)
-				fprintf(stderr, "%s: command not found\n", args[0]);
-			else
-				fprintf(stderr, "%s: Is a directory\n", args[0]);
-		}
+		fprintf(stderr, "Command not found: %s\n", args[0]);
 	}
 }
