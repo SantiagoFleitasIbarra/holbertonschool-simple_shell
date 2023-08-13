@@ -92,6 +92,7 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		fprintf(stderr, "Command not found: %s\n", args[0]);
+		perror(args[0]);
+		exit(EXIT_FAILURE);
 	}
 }
