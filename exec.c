@@ -10,7 +10,7 @@ void execute_command(char **args)
 	if (pid == 0)
 	{
 		execve(args[0], args, environ);
-		perror("Error");
+		perror(args[0]);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0)
 		wait(NULL);
@@ -24,7 +24,7 @@ void execute_command(char **args)
 void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
-		exit(0);
+		exitt(args);
 	else if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
@@ -98,4 +98,47 @@ void search_and_execute(char **args)
 		perror(args[0]);
 		exit(EXIT_FAILURE);
 	}
+}
+/**
+ * exitt - exits the shell with or without a return of status n
+ * @arv: array of words of the entered line
+ */
+void exitt(char **args)
+{
+	int n;
+
+	if (args[1])
+	{
+		n = _atoi(args[1]);
+		if (n <= -1)
+			n = 2;
+		exit(n);
+	}
+	exit(0);
+}
+/**
+ * _atoi - converts a string into an integer
+ *@s: pointer to a string
+ *Return: the integer
+ */
+int _atoi(char *s)
+{
+	int i, integer, sign = 1;
+
+	i = 0;
+	integer = 0;
+	while (!((s[i] >= '0') && (s[i] <= '9')) && (s[i] != '\0'))
+	{
+		if (s[i] == '-')
+		{
+			sign = sign * (-1);
+		}
+		i++;
+	}
+	while ((s[i] >= '0') && (s[i] <= '9'))
+	{
+		integer = (integer * 10) + (sign * (s[i] - '0'));
+		i++;
+	}
+	return (integer);
 }
