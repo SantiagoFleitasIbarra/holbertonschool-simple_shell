@@ -24,7 +24,7 @@ void execute_command(char **args)
 void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
-		exit(1);
+		exit(0);
 	else if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
