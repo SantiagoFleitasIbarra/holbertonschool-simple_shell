@@ -1,134 +1,144 @@
-#include "shell.h"
-
-
+# include "shell.h"
 /**
- * splitstring - splits a string and makes it an array of pointers to words
- * @str: the string to be split
- * @delim: the delimiter
- * Return: array of pointers to words
- */
-
-char **splitstring(char *str, const char *delim)
+ * execute_command - manages the execution of external commands in the shell
+ * @args: string arrangement
+*/
+void execute_command(char **args)
 {
-	int i, wn;
-	char **array;
-	char *token;
-	char *copy;
+	pid_t pid = fork();
 
-	copy = malloc(_strlen(str) + 1);
-	if (copy == NULL)
+	if (pid == 0)
 	{
-		perror(_getenv("_"));
-		return (NULL);
-	}
-	i = 0;
-	while (str[i])
-	{
-		copy[i] = str[i];
-		i++;
-	}
-	copy[i] = '\0';
-
-	token = strtok(copy, delim);
-	array = malloc((sizeof(char *) * 2));
-	array[0] = _strdup(token);
-
-	i = 1;
-	wn = 3;
-	while (token)
-	{
-		token = strtok(NULL, delim);
-		array = _realloc(array, (sizeof(char *) * (wn - 1)), (sizeof(char *) * wn));
-		array[i] = _strdup(token);
-		i++;
-		wn++;
-	}
-	free(copy);
-	return (array);
+		execve(args[0], args, environ);
+		perror(args[0]);
+		exit(EXIT_FAILURE);
+	} else if (pid > 0)
+		wait(NULL);
+	else
+		perror("Fork failed");
 }
-
 /**
- * execute - executes a command
- * @argv: array of arguments
- */
-
-void execute(char **argv)
+ * execute_input - executes a command provided as an argument
+ * @args: string arrangement
+*/
+void execute_input(char **args)
 {
-
-	int d, status;
-
-	if (!argv || !argv[0])
-		return;
-	d = fork();
-	if (d == -1)
+	if (strcmp(args[0], "exit") == 0)
+		exitt(args);
+	else if (strcmp(args[0], "env") == 0)
 	{
-		perror(_getenv("_"));
+		char **env = environ;
+
+		while (*env)
+		{
+			printf("%s\n", *env);
+			env++;
+		}
+	} else if (strcmp(args[0], "cd") == 0)
+	{
+		handle_cd(args);
+	} else if (strcmp(args[0], "help") == 0)
+	{
+		handle_help();
+	} else if (strcmp(args[0], "setenv") == 0)
+	{
+		handle_setenv(args);
+	} else if (strcmp(args[0], "unsetenv") == 0)
+	{
+		handle_unsetenv(args);
 	}
-	if (d == 0)
+	else
 	{
-		execve(argv[0], argv, environ);
-			perror(argv[0]);
+		if (is_absolute_path(args[0]))
+		{
+			if (access(args[0], X_OK) == 0)
+				execute_command(args);
+			else
+			{
+				perror(args[0]);
+				exit(EXIT_FAILURE);
+			}
+		} else
+		{
+			search_and_execute(args);
+		}
+
+	}
+}
+/**
+ * search_and_execute - search for a command in the PATH locations
+ * @args: an arrangement of strings
+*/
+void search_and_execute(char **args)
+{
+	char *path = getenv("PATH");
+
+	if (args[0] == NULL)
+		return;
+
+	if (path)
+	{
+		char path_copy[MAX_INPUT_SIZE];
+		char *dir = strtok(path_copy, ":");
+
+		strcpy(path_copy, path);
+		while (dir)
+		{
+			char command_path[MAX_INPUT_SIZE];
+
+			snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
+			if (access(command_path, X_OK) == 0)
+			{
+				args[0] = command_path;
+				execute_command(args);
+				return;
+			}
+			dir = strtok(NULL, ":");
+		}
+		perror(args[0]);
 		exit(EXIT_FAILURE);
 	}
-	wait(&status);
 }
 /**
- * _realloc - Reallocates memory block
- * @ptr: previous pointer
- * @old_size: old size of previous pointer
- * @new_size: new size for our pointer
- * Return: New resized Pointer
+ * exitt - exits the shell with or without a return of status n
+ * @arv: array of words of the entered line
  */
-
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
+void exitt(char **args)
 {
-	char *new;
-	char *old;
+	int n;
 
-	unsigned int i;
-
-	if (ptr == NULL)
-		return (malloc(new_size));
-
-	if (new_size == old_size)
-		return (ptr);
-
-	if (new_size == 0 && ptr != NULL)
+	if (args[1])
 	{
-		free(ptr);
-		return (NULL);
+		n = _atoi(args[1]);
+		if (n <= -1)
+			n = 2;
+		exit(n);
 	}
-
-	new = malloc(new_size);
-	old = ptr;
-	if (new == NULL)
-		return (NULL);
-
-	if (new_size > old_size)
-	{
-		for (i = 0; i < old_size; i++)
-			new[i] = old[i];
-		free(ptr);
-		for (i = old_size; i < new_size; i++)
-			new[i] = '\0';
-	}
-	if (new_size < old_size)
-	{
-		for (i = 0; i < new_size; i++)
-			new[i] = old[i];
-		free(ptr);
-	}
-	return (new);
+	exit(0);
 }
 /**
- * freearv - frees the array of pointers arv
- *@arv: array of pointers
+ * _atoi - converts a string into an integer
+ *@s: pointer to a string
+ *Return: the integer
  */
-void freearv(char **arv)
+int _atoi(char *s)
 {
-	int i;
+	int i, integer, sign = 1;
 
-	for (i = 0; arv[i]; i++)
-		free(arv[i]);
-	free(arv);
+	i = 0;
+	integer = 0;
+	while (!((s[i] >= '0') && (s[i] <= '9')) && (s[i] != '\0'))
+	{
+		if (s[i] == '-')
+		{
+			sign = sign * (-1);
+		}
+		i++;
+	}
+	while ((s[i] >= '0') && (s[i] <= '9'))
+	{
+		integer = (integer * 10) + (sign * (s[i] - '0'));
+		i++;
+	}
+	return (integer);
 }
