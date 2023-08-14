@@ -4,6 +4,6 @@
 */
 void display_prompt(void)
 {
-	printf("$ ");
+	printf("#cisfun$ ");
 	fflush(stdout);
 }
