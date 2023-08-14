@@ -56,7 +56,6 @@ void execute_input(char **args)
 			else
 			{
 				perror(args[0]);
-				exit(EXIT_FAILURE);
 			}
 		} else
 		{
@@ -95,7 +94,6 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		perror(args[0]);
-		exit(EXIT_FAILURE);
+		printf("%s: command not found\n", args[0]);
 	}
 }

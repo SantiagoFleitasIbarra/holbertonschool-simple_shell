@@ -64,7 +64,7 @@ void handle_noninteractive_mode(void)
 			execute_input(args);
 		else
 		{
-			perror(args[0]);
+			perror("Empty command");
 			exit(EXIT_FAILURE);
 		}
 	}
