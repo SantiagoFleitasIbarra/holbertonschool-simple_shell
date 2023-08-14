@@ -1,82 +1,86 @@
-# include "shell.h"
+#include "shell.h"
 /**
- * main - main program entry
- * Return: 0 Always (Success)
+ * sig_handler - checks if Ctrl C is pressed
+ * @sig_num: int
+ */
+void sig_handler(int sig_num)
+{
+	if (sig_num == SIGINT)
+	{
+		_puts("\n#cisfun$ ");
+	}
+}
+/**
+* _EOF - handles the End of File
+* @len: return value of getline function
+* @buff: buffer
+ */
+void _EOF(int len, char *buff)
+{
+	(void)buff;
+	if (len == -1)
+	{
+		if (isatty(STDIN_FILENO))
+		{
+			_puts("\n");
+			free(buff);
+		}
+		exit(0);
+	}
+}
+/**
+  * _isatty - verif if terminal
+  */
+
+void _isatty(void)
+{
+	if (isatty(STDIN_FILENO))
+		_puts("#cisfun$ ");
+}
+/**
+ * main - Shell
+ * Return: always 0 (Success)
 */
 int main(void)
 {
-	if (!isatty(STDIN_FILENO))
-		handle_noninteractive_mode();
-	else
+	ssize_t len = 0;
+	char *buff = NULL, *value, *pathname, **arv;
+	size_t size = 0;
+	list_path *head = '\0';
+	void (*f)(char **);
+
+	signal(SIGINT, sig_handler);
+	while (len != EOF)
 	{
-		while (1)
-		{
-			char input[MAX_INPUT_SIZE];
-			char *args[MAX_INPUT_SIZE / 2 + 1];
-
-			display_prompt();
-			if (fgets(input, sizeof(input), stdin) == NULL)
-			{
-				printf("\n");
-				break;
-			}
-
-			input[strcspn(input, "\n")] = '\0';
-			tokenize_input(input, args);
-			if (args[0] != NULL)
-				execute_input(args);
-		}
-	}
-	return (0);
-}
-/**
- * tokenize_input - splits an input string into tokens
- * @input: input string
- * @args: string arrangement
-*/
-void tokenize_input(char *input, char **args)
-{
-	char *token = strtok(input, " ");
-	int i = 0;
-
-	while (token != NULL)
-	{
-		args[i++] = token;
-		token = strtok(NULL, " ");
-	}
-	args[i] = NULL;
-}
-/**
- * handle_noninteractive_mode - handles command execution in non-interactive
- * mode
-*/
-void handle_noninteractive_mode(void)
-{
-	char input[MAX_INPUT_SIZE];
-
-	while (fgets(input, sizeof(input), stdin))
-	{
-		char *args[MAX_INPUT_SIZE / 2 + 1];
-
-		input[strcspn(input, "\n")] = '\0';
-		tokenize_input(input, args);
-		if (args[0] != NULL)
-			execute_input(args);
+		_isatty();
+		len = getline(&buff, &size, stdin);
+		_EOF(len, buff);
+		arv = splitstring(buff, " \n");
+		if (!arv || !arv[0])
+			execute(arv);
 		else
 		{
-			perror("Empty command");
-			exit(EXIT_FAILURE);
+			value = _getenv("PATH");
+			head = linkpath(value);
+			pathname = _which(arv[0], head);
+			f = checkbuild(arv);
+			if (f)
+			{
+				free(buff);
+				f(arv);
+			}
+			else if (!pathname)
+				execute(arv);
+			else if (pathname)
+			{
+				free(arv[0]);
+				arv[0] = pathname;
+				execute(arv);
+			}
 		}
 	}
-}
-/**
- * is_absolute_path - checks whether a command is an absolute path or not
- * @command: command to be executed
- * Return: an integer value
- * 1, means that the command is an absolute path. If it returns
- * 0, the command is not an absolute path
-*/
-int is_absolute_path(char *command)
-{
-	return (strchr(command, '/') != NULL);
+	free_list(head);
+	freearv(arv);
+	free(buff);
+	return (0);
 }
