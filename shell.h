@@ -1,41 +1,36 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef SHELL_H_
+#define SHELL_H_
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/wait.h>
-#include <dirent.h>
-#include <signal.h>
+#include <sys/stat.h>
 #include <errno.h>
 
-#define TOKEN_BUFFER_SIZE 64
-#define TOKEN_DELIMITERS " \t\r\n\a"
-#define EXECUTION_ERROR 127
+extern char **environ;
 
-/***/
-typedef struct PathNode {
+#define BUFFER_SIZE 1024
+
+typedef struct path_s
+{
 	char *dir;
-	struct PathNode *next;
-} PathNode;
+	struct path_s *next;
+} path_t;
 
-void init_token(void);
-void check_allocation(void *ptr);
-void resize_token_buffer(void);
-char *parse_input(void);
-void parse_path(const char *path, PathNode **path_list);
-char *search_path(const char *cmd, PathNode *path_list);
-void free_path_list(PathNode *path_list);
+char **parse_input(char *input);
+void execute_command(char **tokens);
+void direct_execute(char **tokens);
+void path_execute(char **tokens);
+void free_tokens(char **tokens);
 char *_getenv(const char *name);
-void direct_execute(char *cmd);
-void path_execute(char *cmd, char **args, PathNode *path_list);
-void execute_command(char *cmd, PathNode *path_list);
-void main_loop(void);
-char **tokenize(char *line);
-void direct_execute_args(char *cmd, char **args);
-void print_error(const char *command, const char *message);
+path_t *parse_path(void);
+char *search_path(char *cmd, path_t *path_list);
+void free_path_list(path_t *head);
+char **init_token(void);
+void check_allocation(char **tokens);
+char **resize_token_buffer(char **tokens, size_t *bufsize);
 
 #endif

@@ -1,73 +1,69 @@
 #include "shell.h"
-
-extern char **environ;
-
 /***/
-void direct_execute(char *cmd)
+void execute_command(char **tokens)
 {
-	pid_t child_pid;
+	if (tokens[0][0] == '/' || tokens[0][0] == '.')
+	{
+		direct_execute(tokens);
+		return;
+	}
+	path_execute(tokens);
+}
+/***/
+void direct_execute(char **tokens)
+{
+	pid_t pid;
 	int status;
 
-	child_pid = fork();
-	if (child_pid == 0)
+	pid = fork();
+	if (pid == 0)
 	{
-		char *args[2];
-
-		args[0] = cmd;
-		args[1] = NULL;
-		if (execve(cmd, args, NULL) == -1)
+		if (execve(tokens[0], tokens, environ) == -1)
 		{
-			perror(cmd);
-			_exit(EXIT_FAILURE);
+			fprintf(stderr, "%s: %s\n", tokens[0], strerror(errno));
+			exit(EXIT_FAILURE);
 		}
-	} else if (child_pid < 0)
-		perror("Fork error");
-	else
-		wait(&status);
-}
-/***/
-void path_execute(char *cmd, char **args, PathNode *path_list)
-{
-	char *full_path = search_path(cmd, path_list);
-
-	if (full_path != NULL)
-	{
-		direct_execute_args(full_path, args);
-		free(full_path);
-	} else
-		print_error(cmd, "command not found");
-}
-/***/
-void execute_command(char *cmd, PathNode *path_list)
-{
-	if (cmd[0] == '/' || cmd[0] == '.')
-		direct_execute(cmd);
+	} else if (pid < 0)
+		perror("./shell");
 	else
 	{
-		char **args = tokenize(cmd);
-
-		if (args[0])
-			path_execute(args[0], args, path_list);
-		free(args);
+		do {
+			waitpid(pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 }
 /***/
-void direct_execute_args(char *cmd, char **args)
+void path_execute(char **tokens)
 {
-	pid_t child_pid;
+	pid_t pid;
 	int status;
+	path_t *path_list;
+	char *full_path;
 
-	child_pid = fork();
-	if (child_pid == 0)
+	path_list = parse_path();
+	full_path = search_path(tokens[0], path_list);
+	if (full_path)
 	{
-		if (access(cmd, X_OK) == 0)
+		free(tokens[0]);
+		tokens[0] = full_path;
+		pid = fork();
+		if (pid == 0)
 		{
-			execve(cmd, args, environ);
-		}
+			if (execve(tokens[0], tokens, environ) == -1)
+			{
+				fprintf(stderr, "%s: %s\n", tokens[0], strerror(errno));
+				exit(EXIT_FAILURE);
+			}
+		} else if (pid < 0)
+			perror("./shell");
 		else
-			print_error(cmd, strerror(errno));
-	} else if (child_pid < 0)
-		print_error("fork", strerror(errno));
+		{
+			do {
+				waitpid(pid, &status, WUNTRACED);
+			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		}
+	}
 	else
-		wait(&status);
+		fprintf(stderr, "%s: command not found\n", tokens[0]);
+	free_path_list(path_list);
 }
