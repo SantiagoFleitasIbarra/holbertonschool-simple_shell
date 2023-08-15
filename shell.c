@@ -18,7 +18,7 @@ int main(void)
 			if (fgets(input, sizeof(input), stdin) == NULL)
 			{
 				printf("\n");
-				break;
+				exit(EXIT_SUCCESS);
 			}
 
 			input[strcspn(input, "\n")] = '\0';
@@ -64,7 +64,7 @@ void handle_noninteractive_mode(void)
 			execute_input(args);
 		else
 		{
-			perror("Empty command");
+			fprintf(stderr, "Error: Empty command\n");
 			exit(EXIT_FAILURE);
 		}
 	}
