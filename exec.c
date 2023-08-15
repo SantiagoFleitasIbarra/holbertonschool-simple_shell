@@ -1,99 +1,73 @@
-# include "shell.h"
-/**
- * execute_command - manages the execution of external commands in the shell
- * @args: string arrangement
-*/
-void execute_command(char **args)
-{
-	pid_t pid = fork();
+#include "shell.h"
 
-	if (pid == 0)
-	{
-		execve(args[0], args, environ);
-		perror(args[0]);
-		exit(EXIT_FAILURE);
-	} else if (pid > 0)
-		wait(NULL);
-	else
-		perror("Fork failed");
-}
-/**
- * execute_input - executes a command provided as an argument
- * @args: string arrangement
-*/
-void execute_input(char **args)
-{
-	if (strcmp(args[0], "exit") == 0)
-		exit(0);
-	else if (strcmp(args[0], "env") == 0)
-	{
-		char **env = environ;
+extern char **environ;
 
-		while (*env)
+/***/
+void direct_execute(char *cmd)
+{
+	pid_t child_pid;
+	int status;
+
+	child_pid = fork();
+	if (child_pid == 0)
+	{
+		char *args[2];
+
+		args[0] = cmd;
+		args[1] = NULL;
+		if (execve(cmd, args, NULL) == -1)
 		{
-			printf("%s\n", *env);
-			env++;
+			perror(cmd);
+			_exit(EXIT_FAILURE);
 		}
-	} else if (strcmp(args[0], "cd") == 0)
+	} else if (child_pid < 0)
+		perror("Fork error");
+	else
+		wait(&status);
+}
+/***/
+void path_execute(char *cmd, char **args, PathNode *path_list)
+{
+	char *full_path = search_path(cmd, path_list);
+
+	if (full_path != NULL)
 	{
-		handle_cd(args);
-	} else if (strcmp(args[0], "help") == 0)
-	{
-		handle_help();
-	} else if (strcmp(args[0], "setenv") == 0)
-	{
-		handle_setenv(args);
-	} else if (strcmp(args[0], "unsetenv") == 0)
-	{
-		handle_unsetenv(args);
-	}
+		direct_execute_args(full_path, args);
+		free(full_path);
+	} else
+		print_error(cmd, "command not found");
+}
+/***/
+void execute_command(char *cmd, PathNode *path_list)
+{
+	if (cmd[0] == '/' || cmd[0] == '.')
+		direct_execute(cmd);
 	else
 	{
-		if (is_absolute_path(args[0]))
-		{
-			if (access(args[0], X_OK) == 0)
-				execute_command(args);
-			else
-			{
-				perror(args[0]);
-			}
-		} else
-		{
-			search_and_execute(args);
-		}
+		char **args = tokenize(cmd);
 
+		if (args[0])
+			path_execute(args[0], args, path_list);
+		free(args);
 	}
 }
-/**
- * search_and_execute - search for a command in the PATH locations
- * @args: an arrangement of strings
-*/
-void search_and_execute(char **args)
+/***/
+void direct_execute_args(char *cmd, char **args)
 {
-	char *path = getenv("PATH");
+	pid_t child_pid;
+	int status;
 
-	if (args[0] == NULL)
-		return;
-
-	if (path)
+	child_pid = fork();
+	if (child_pid == 0)
 	{
-		char path_copy[MAX_INPUT_SIZE];
-		char *dir = strtok(path_copy, ":");
-
-		strcpy(path_copy, path);
-		while (dir)
+		if (access(cmd, X_OK) == 0)
 		{
-			char command_path[MAX_INPUT_SIZE];
-
-			snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
-			if (access(command_path, X_OK) == 0)
-			{
-				args[0] = command_path;
-				execute_command(args);
-				return;
-			}
-			dir = strtok(NULL, ":");
+			execve(cmd, args, environ);
 		}
-		printf("%s: command not found\n", args[0]);
-	}
+		else
+			print_error(cmd, strerror(errno));
+	} else if (child_pid < 0)
+		print_error("fork", strerror(errno));
+	else
+		wait(&status);
 }
