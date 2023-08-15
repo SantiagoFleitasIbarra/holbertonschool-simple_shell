@@ -1,69 +1,99 @@
-#include "shell.h"
-/***/
-void execute_command(char **tokens)
+# include "shell.h"
+/**
+ * execute_command - manages the execution of external commands in the shell
+ * @args: string arrangement
+*/
+void execute_command(char **args)
 {
-	if (tokens[0][0] == '/' || tokens[0][0] == '.')
-	{
-		direct_execute(tokens);
-		return;
-	}
-	path_execute(tokens);
-}
-/***/
-void direct_execute(char **tokens)
-{
-	pid_t pid;
-	int status;
+	pid_t pid = fork();
 
-	pid = fork();
 	if (pid == 0)
 	{
-		if (execve(tokens[0], tokens, environ) == -1)
+		execve(args[0], args, environ);
+		perror(args[0]);
+		exit(EXIT_FAILURE);
+	} else if (pid > 0)
+		wait(NULL);
+	else
+		perror("Fork failed");
+}
+/**
+ * execute_input - executes a command provided as an argument
+ * @args: string arrangement
+*/
+void execute_input(char **args)
+{
+	if (strcmp(args[0], "exit") == 0)
+		exit(0);
+	else if (strcmp(args[0], "env") == 0)
+	{
+		char **env = environ;
+
+		while (*env)
 		{
-			fprintf(stderr, "%s: %s\n", tokens[0], strerror(errno));
-			exit(EXIT_FAILURE);
+			printf("%s\n", *env);
+			env++;
 		}
-	} else if (pid < 0)
-		perror("./shell");
+	} else if (strcmp(args[0], "cd") == 0)
+	{
+		handle_cd(args);
+	} else if (strcmp(args[0], "help") == 0)
+	{
+		handle_help();
+	} else if (strcmp(args[0], "setenv") == 0)
+	{
+		handle_setenv(args);
+	} else if (strcmp(args[0], "unsetenv") == 0)
+	{
+		handle_unsetenv(args);
+	}
 	else
 	{
-		do {
-			waitpid(pid, &status, WUNTRACED);
-		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+		if (is_absolute_path(args[0]))
+		{
+			if (access(args[0], X_OK) == 0)
+				execute_command(args);
+			else
+			{
+				perror(args[0]);
+			}
+		} else
+		{
+			search_and_execute(args);
+		}
+
 	}
 }
-/***/
-void path_execute(char **tokens)
+/**
+ * search_and_execute - search for a command in the PATH locations
+ * @args: an arrangement of strings
+*/
+void search_and_execute(char **args)
 {
-	pid_t pid;
-	int status;
-	path_t *path_list;
-	char *full_path;
+	char *path = getenv("PATH");
 
-	path_list = parse_path();
-	full_path = search_path(tokens[0], path_list);
-	if (full_path)
+	if (args[0] == NULL)
+		return;
+
+	if (path)
 	{
-		free(tokens[0]);
-		tokens[0] = full_path;
-		pid = fork();
-		if (pid == 0)
+		char path_copy[MAX_INPUT_SIZE];
+		char *dir = strtok(path_copy, ":");
+
+		strcpy(path_copy, path);
+		while (dir)
 		{
-			if (execve(tokens[0], tokens, environ) == -1)
+			char command_path[MAX_INPUT_SIZE];
+
+			snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
+			if (access(command_path, X_OK) == 0)
 			{
-				fprintf(stderr, "%s: %s\n", tokens[0], strerror(errno));
-				exit(EXIT_FAILURE);
+				args[0] = command_path;
+				execute_command(args);
+				return;
 			}
-		} else if (pid < 0)
-			perror("./shell");
-		else
-		{
-			do {
-				waitpid(pid, &status, WUNTRACED);
-			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+			dir = strtok(NULL, ":");
 		}
+		printf("%s: command not found\n", args[0]);
 	}
-	else
-		fprintf(stderr, "%s: command not found\n", tokens[0]);
-	free_path_list(path_list);
 }

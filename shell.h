@@ -1,36 +1,26 @@
-#ifndef SHELL_H_
-#define SHELL_H_
-
+# ifndef _SHELL_H_
+# define _SHELL_H_
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
 #include <errno.h>
-
+#include <fcntl.h>
+#include <sys/stat.h>
+#define MAX_INPUT_SIZE 1024
 extern char **environ;
-
-#define BUFFER_SIZE 1024
-
-typedef struct path_s
-{
-	char *dir;
-	struct path_s *next;
-} path_t;
-
-char **parse_input(char *input);
-void execute_command(char **tokens);
-void direct_execute(char **tokens);
-void path_execute(char **tokens);
-void free_tokens(char **tokens);
-char *_getenv(const char *name);
-path_t *parse_path(void);
-char *search_path(char *cmd, path_t *path_list);
-void free_path_list(path_t *head);
-char **init_token(void);
-void check_allocation(char **tokens);
-char **resize_token_buffer(char **tokens, size_t *bufsize);
-
-#endif
+void display_prompt(void);
+void execute_command(char **args);
+int is_absolute_path(char *command);
+void handle_noninteractive_mode(void);
+void tokenize_input(char *input, char **args);
+void execute_input(char **args);
+void search_and_execute(char **args);
+int main(void);
+void handle_cd(char **args);
+void handle_help(void);
+void handle_setenv(char **args);
+void handle_unsetenv(char **args);
+# endif

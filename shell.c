@@ -1,41 +1,82 @@
 # include "shell.h"
-/***/
+/**
+ * main - main program entry
+ * Return: 0 Always (Success)
+*/
 int main(void)
 {
-	char *input_line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char **tokens;
-
-	while (1)
+	if (!isatty(STDIN_FILENO))
+		handle_noninteractive_mode();
+	else
 	{
-		printf("#cisfun$ ");
-		read = getline(&input_line, &len, stdin);
-
-		if (read == -1)
+		while (1)
 		{
-			free(input_line);
-			printf("\n");
-			exit(EXIT_SUCCESS);
-		}
+			char input[MAX_INPUT_SIZE];
+			char *args[MAX_INPUT_SIZE / 2 + 1];
 
-		tokens = parse_input(input_line);
+			display_prompt();
+			if (fgets(input, sizeof(input), stdin) == NULL)
+			{
+				printf("\n");
+				break;
+			}
 
-		if (tokens[0] == NULL)
-		{
-			free(tokens);
-			continue;
+			input[strcspn(input, "\n")] = '\0';
+			tokenize_input(input, args);
+			if (args[0] != NULL)
+				execute_input(args);
 		}
-
-		if (strcmp(tokens[0], "exit") == 0)
-		{
-			free(tokens);
-			free(input_line);
-			exit(EXIT_SUCCESS);
-		}
-		execute_command(tokens);
-		free(tokens);
 	}
-	free(input_line);
-	return (EXIT_SUCCESS);
+	return (0);
+}
+/**
+ * tokenize_input - splits an input string into tokens
+ * @input: input string
+ * @args: string arrangement
+*/
+void tokenize_input(char *input, char **args)
+{
+	char *token = strtok(input, " ");
+	int i = 0;
+
+	while (token != NULL)
+	{
+		args[i++] = token;
+		token = strtok(NULL, " ");
+	}
+	args[i] = NULL;
+}
+/**
+ * handle_noninteractive_mode - handles command execution in non-interactive
+ * mode
+*/
+void handle_noninteractive_mode(void)
+{
+	char input[MAX_INPUT_SIZE];
+
+	while (fgets(input, sizeof(input), stdin))
+	{
+		char *args[MAX_INPUT_SIZE / 2 + 1];
+
+		input[strcspn(input, "\n")] = '\0';
+		tokenize_input(input, args);
+		if (args[0] != NULL)
+			execute_input(args);
+		else
+		{
+			perror("Empty command");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+/**
+ * is_absolute_path - checks whether a command is an absolute path or not
+ * @command: command to be executed
+ * Return: an integer value
+ * 1, means that the command is an absolute path. If it returns
+ * 0, the command is not an absolute path
+*/
+int is_absolute_path(char *command)
+{
+	return (strchr(command, '/') != NULL);
 }
