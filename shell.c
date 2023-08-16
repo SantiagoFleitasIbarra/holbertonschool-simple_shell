@@ -20,7 +20,6 @@ int main(void)
 				printf("\n");
 				exit(EXIT_SUCCESS);
 			}
-
 			input[strcspn(input, "\n")] = '\0';
 			tokenize_input(input, args);
 			if (args[0] != NULL)
@@ -61,10 +60,14 @@ void handle_noninteractive_mode(void)
 		input[strcspn(input, "\n")] = '\0';
 		tokenize_input(input, args);
 		if (args[0] != NULL)
+		{
 			execute_input(args);
+			if (isatty(STDIN_FILENO))
+				display_prompt();
+		}
 		else
 		{
-			fprintf(stderr, "Error: Empty command\n");
+			perror("Empty command");
 			exit(EXIT_FAILURE);
 		}
 	}
