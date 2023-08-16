@@ -14,7 +14,7 @@ A Unix shell is a command-line interpreter or shell that provides a command line
 | `cd` | Change the current working directory |
 | `env` | Print the environment |
 | `exit` | Exit the shell |
-| `help` | Print a help messages for built-ins | 
+| `help` | Print a help messages for built-ins |
 | `setenv` | Set an environment variable |
 | `unsetenv` | Unset an environment variable |
 
