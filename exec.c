@@ -58,7 +58,7 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				fprintf(stderr, "hsh: %s No such file or directory\n", args[0]);
+				fprintf(stderr, "bash: %s No such file or directory\n", args[0]);
 				/**perror(args[0]);*/
 		} else
 			search_and_execute(args);
