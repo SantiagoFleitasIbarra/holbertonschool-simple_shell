@@ -10,7 +10,8 @@ void execute_command(char **args)
 	if (pid == 0)
 	{
 		execve(args[0], args, environ);
-		perror(args[0]);
+		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
+		/*perror(args[0]);*/
 		exit(EXIT_FAILURE);
 	} else if (pid > 0)
 		wait(NULL);
@@ -57,7 +58,8 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				perror(args[0]);
+				fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
+				/**perror(args[0]);*/
 		} else
 			search_and_execute(args);
 	}
@@ -94,7 +96,7 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		printf("./hsh: %s: command not found\n", args[0]);
+		printf("%s: command not found\n", args[0]);
 		free(path_copy);
 	}
 
