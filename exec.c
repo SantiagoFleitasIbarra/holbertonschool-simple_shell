@@ -57,14 +57,9 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-			{
 				perror(args[0]);
-			}
 		} else
-		{
 			search_and_execute(args);
-		}
-
 	}
 }
 /**
@@ -73,7 +68,7 @@ void execute_input(char **args)
 */
 void search_and_execute(char **args)
 {
-	char *path = getenv("PATH");
+	char *path = _getenv("PATH");
 
 	if (args[0] == NULL)
 		return;
@@ -103,4 +98,26 @@ void search_and_execute(char **args)
 		free(path_copy);
 	}
 
+}
+/**
+ * _getenv - retrieves the value of an environment variable
+ * @name: name of the environment variable to retrieve
+ *
+ * Return: pointer to the value of the environment variable,
+ * or NULL if not found
+ */
+char *_getenv(const char *name)
+{
+	int i = 0;
+	int len = strlen(name);
+
+	while (environ[i])
+	{
+		if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
+		{
+			return (&environ[i][len + 1]);
+		}
+		i++;
+	}
+	return (NULL);
 }
