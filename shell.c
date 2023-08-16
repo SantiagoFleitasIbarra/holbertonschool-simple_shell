@@ -57,6 +57,7 @@ void handle_noninteractive_mode(void)
 	while (fgets(input, sizeof(input), stdin))
 	{
 		char *args[MAX_INPUT_SIZE / 2 + 1];
+
 		input[strcspn(input, "\n")] = '\0';
 		tokenize_input(input, args);
 		if (args[0] != NULL)
