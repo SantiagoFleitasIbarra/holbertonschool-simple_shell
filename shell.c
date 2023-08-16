@@ -67,7 +67,8 @@ void handle_noninteractive_mode(void)
 		}
 		else
 		{
-			perror("Empty command");
+			fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
+			/**perror("Empty command");*/
 			exit(EXIT_FAILURE);
 		}
 	}
