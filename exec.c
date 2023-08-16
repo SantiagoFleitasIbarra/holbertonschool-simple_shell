@@ -10,8 +10,7 @@ void execute_command(char **args)
 	if (pid == 0)
 	{
 		execve(args[0], args, environ);
-		perror("Error");
-		/*perror(args[0]);*/
+		perror(args[0]);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0)
 		wait(NULL);
@@ -58,8 +57,7 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				fprintf(stderr, "bash: %s No such file or directory\n", args[0]);
-				/**perror(args[0]);*/
+				perror(args[0]);
 		} else
 			search_and_execute(args);
 	}
@@ -96,7 +94,7 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		printf("%s: command not found\n", args[0]);
+		printf("./hsh: %s: command not found\n", args[0]);
 		free(path_copy);
 	}
 
