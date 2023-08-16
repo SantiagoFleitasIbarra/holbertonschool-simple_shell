@@ -24,7 +24,10 @@ void execute_command(char **args)
 void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
+	{
 		exit(EXIT_SUCCESS);
+		free(args);
+	}
 	else if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
@@ -77,7 +80,7 @@ void search_and_execute(char **args)
 
 	if (path)
 	{
-		char path_copy[MAX_INPUT_SIZE];
+		char *path_copy = strdup(path);
 		char *dir = strtok(path_copy, ":");
 
 		strcpy(path_copy, path);
@@ -88,12 +91,16 @@ void search_and_execute(char **args)
 			snprintf(command_path, sizeof(command_path), "%s/%s", dir, args[0]);
 			if (access(command_path, X_OK) == 0)
 			{
-				args[0] = command_path;
+				args[0] = strdup(command_path);
 				execute_command(args);
+				free(args[0]);
+				free(path_copy);
 				return;
 			}
 			dir = strtok(NULL, ":");
 		}
 		printf("%s: command not found\n", args[0]);
+		free(path_copy);
 	}
+
 }
