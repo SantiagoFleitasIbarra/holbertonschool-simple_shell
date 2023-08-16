@@ -7,7 +7,7 @@ void handle_cd(char **args)
 {
 	if (args[1] == NULL)
 	{
-		char *home_dir = getenv("HOME");
+		char *home_dir = _getenv("HOME");
 
 		if (home_dir != NULL)
 		{
@@ -27,8 +27,9 @@ void handle_cd(char **args)
 					perror("cd");
 			} else
 				fprintf(stderr, "bash: cd: %s: Not a directory\n", args[1]);
-		} else
-			fprintf(stderr, "bash: cd: %s: No such file or directory\n", args[1]);
+		}
+		else
+			fprintf(stderr, "cd: %s: No such file or directory\n", args[1]);
 	}
 }
 /**
