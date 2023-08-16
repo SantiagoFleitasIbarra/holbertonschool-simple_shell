@@ -14,6 +14,7 @@ extern char **environ;
 void display_prompt(void);
 void execute_command(char **args);
 int is_absolute_path(char *command);
+char *_getenv(const char *name);
 void handle_noninteractive_mode(void);
 void tokenize_input(char *input, char **args);
 void execute_input(char **args);
