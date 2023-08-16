@@ -10,7 +10,8 @@ void execute_command(char **args)
 	if (pid == 0)
 	{
 		execve(args[0], args, environ);
-		perror(args[0]);
+		perror("Error");
+		/*perror(args[0]);*/
 		exit(EXIT_FAILURE);
 	} else if (pid > 0)
 		wait(NULL);
@@ -57,7 +58,8 @@ void execute_input(char **args)
 			if (access(args[0], X_OK) == 0)
 				execute_command(args);
 			else
-				perror(args[0]);
+				fprintf(stderr, "hsh: %s No such file or directory\n", args[0]);
+				/**perror(args[0]);*/
 		} else
 			search_and_execute(args);
 	}
