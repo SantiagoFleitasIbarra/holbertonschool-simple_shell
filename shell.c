@@ -35,13 +35,13 @@ int main(void)
 */
 void tokenize_input(char *input, char **args)
 {
-	char *token = strtok(input, " ");
+	char *token = strtok(input, " \t");
 	int i = 0;
 
 	while (token != NULL)
 	{
 		args[i++] = token;
-		token = strtok(NULL, " ");
+		token = strtok(NULL, " \t");
 	}
 	args[i] = NULL;
 }
