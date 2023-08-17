@@ -13,8 +13,13 @@ void execute_command(char **args)
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
 		exit(EXIT_FAILURE);
-	} else if (pid > 0)
-		wait(NULL);
+	}
+	else if (pid > 0)
+	{
+		int status;
+
+		wait(&status);
+	}
 	else
 		perror("Fork failed");
 }
