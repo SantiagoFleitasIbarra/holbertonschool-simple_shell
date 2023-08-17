@@ -19,16 +19,6 @@ void execute_command(char **args)
 		int status;
 
 		wait(&status);
-
-		if (WIFEXITED(status))
-		{
-			int exit_status = WEXITSTATUS(status);
-
-			if (exit_status != 0)
-				fprintf(stderr, "Command exited with status: %d\n", exit_status);
-		}
-		else
-			fprintf(stderr, "Command did not exit normally\n");
 	}
 	else
 		perror("Fork failed");
