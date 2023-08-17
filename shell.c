@@ -6,22 +6,24 @@
 int main(void)
 {
 	if (!isatty(STDIN_FILENO))
-		handle_noninteractive_mode();
+		handle_noninteractive_mode(stdin);
 	else
 	{
 		while (1)
 		{
-			char input[MAX_INPUT_SIZE];
+			char *line = NULL;
 			char *args[MAX_INPUT_SIZE / 2 + 1];
+			size_t len = 0;
 
 			display_prompt();
-			if (fgets(input, sizeof(input), stdin) == NULL)
+			if (getline(&line, &len, stdin) == -1)
 			{
+				free(line);
 				printf("\n");
 				exit(EXIT_SUCCESS);
 			}
-			input[strcspn(input, "\n")] = '\0';
-			tokenize_input(input, args);
+			line[strcspn(line, "\n")] = '\0';
+			tokenize_input(line, args);
 			if (args[0] != NULL)
 				execute_input(args);
 		}
@@ -33,9 +35,9 @@ int main(void)
  * @input: input string
  * @args: string arrangement
 */
-void tokenize_input(char *input, char **args)
+void tokenize_input(char *line, char **args)
 {
-	char *token = strtok(input, " \t");
+	char *token = strtok(line, " \t");
 	int i = 0;
 
 	while (token != NULL)
@@ -49,29 +51,26 @@ void tokenize_input(char *input, char **args)
  * handle_noninteractive_mode - handles command execution in non-interactive
  * mode
 */
-void handle_noninteractive_mode(void)
+void handle_noninteractive_mode(FILE *input)
 {
-	char input[MAX_INPUT_SIZE];
+	char *line = NULL;
+	size_t len = 0;
 
-	while (fgets(input, sizeof(input), stdin))
+	while (getline(&line, &len, input) != -1)
 	{
 		char *args[MAX_INPUT_SIZE / 2 + 1];
 
-		input[strcspn(input, "\n")] = '\0';
-		tokenize_input(input, args);
+		line[strcspn(line, "\n")] = '\0';
+		tokenize_input(line, args);
+
 		if (args[0] != NULL)
 		{
 			execute_input(args);
 			if (isatty(STDIN_FILENO))
 				display_prompt();
 		}
-		else
-		{
-			fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
-			/**perror("Empty command");*/
-			exit(EXIT_FAILURE);
-		}
 	}
+	free(line);
 }
 /**
  * is_absolute_path - checks whether a command is an absolute path or not
