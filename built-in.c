@@ -1,5 +1,25 @@
 # include "shell.h"
 /**
+ * exitt - implement the builtin command
+ * @args: string arrangement
+*/
+void exitt(char **args)
+{
+	int n;
+
+	if (args[1])
+	{
+		n = _atoi(args[1]);
+
+		if (n <= -1)
+			n = 2;
+		free(args[0]);
+		exit(n);
+	}
+	free(args[0]);
+	exit(0);
+}
+/**
  * handle_cd - implement the builtin command
  * @args: string arrangement
 */
@@ -77,22 +97,3 @@ void handle_unsetenv(char **args)
 	if (unsetenv(args[1]) == -1)
 		fprintf(stderr, "Failed to unset environment variable: %s\n", args[1]);
 }
-/**
- * exitt - implement the builtin command
- * @args: string arrangement
-*/
-/*void exitt(int status)
-{
-	int n;
-
-	if (args[1])
-	{
-		n = _atoi(args[1]);
-		if (n <= -1)
-			n = 2;
-		free(args[0]);
-		exit(n);
-	}
-	free(args[0]);
-	exit(status);
-}*/

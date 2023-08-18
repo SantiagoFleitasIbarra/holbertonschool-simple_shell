@@ -33,7 +33,7 @@ int main(void)
 }
 /**
  * tokenize_input - splits an input string into tokens
- * @input: input string
+ * @line: line of input
  * @args: string arrangement
 */
 void tokenize_input(char *line, char **args)
@@ -51,6 +51,7 @@ void tokenize_input(char *line, char **args)
 /**
  * handle_noninteractive_mode - handles command execution in non-interactive
  * mode
+ * @input: input of string
 */
 void handle_noninteractive_mode(FILE *input)
 {

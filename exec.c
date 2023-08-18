@@ -33,17 +33,7 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		if (args[1])
-		{
-			int n = _atoi(args[1]);
-
-			if (n <= 0)
-				n = 2;
-			free(args[0]);
-			exit(n);
-		}
-		free(args[0]);
-		exit(EXIT_SUCCESS);
+		exitt(args);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
@@ -55,18 +45,13 @@ void execute_input(char **args)
 			env++;
 		}
 	} else if (strcmp(args[0], "cd") == 0)
-	{
 		handle_cd(args);
-	} else if (strcmp(args[0], "help") == 0)
-	{
+	else if (strcmp(args[0], "help") == 0)
 		handle_help();
-	} else if (strcmp(args[0], "setenv") == 0)
-	{
+	else if (strcmp(args[0], "setenv") == 0)
 		handle_setenv(args);
-	} else if (strcmp(args[0], "unsetenv") == 0)
-	{
+	else if (strcmp(args[0], "unsetenv") == 0)
 		handle_unsetenv(args);
-	}
 	else
 	{
 		if (is_absolute_path(args[0]))
@@ -75,7 +60,6 @@ void execute_input(char **args)
 				execute_command(args);
 			else
 				fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
-				/**perror(args[0]);*/
 		} else
 			search_and_execute(args);
 	}
@@ -163,43 +147,3 @@ int _atoi(const char *str)
 	}
 	return (integer);
 }
-/***/
-/**void direct_execute(char **tokens, char *prog, int l_num)
-{
-	pid_t pid = fork();
-
-	if (access(tokens[0], X_OK) == -1)
-	{
-		fprintf(stderr, "%s: %d: %s: %s\n", prog, l_num, tokens[0], strerror(errno));
-		exit(127);
-	}
-	if (pid == 0)
-	{
-		execve(tokens[0], tokens, environ);
-
-		fprintf(stderr, "%s: %d: %s: %s\n", prog, l_num, tokens[0], strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-	else if (pid > 0)
-	{
-		int status;
-
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-		{
-			int exit_status = WEXITSTATUS(status);
-
-			exit(exit_status);
-		}
-		else
-		{
-			fprintf(stderr, "Command did not exit normally\n");
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		perror("Fork failed");
-		exit(EXIT_FAILURE);
-	}
-}**/
