@@ -12,7 +12,7 @@ void execute_command(char **args)
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
-		exit(127);
+		exit(EXIT_FAILURE);
 	}
 	else if (pid > 0)
 	{
@@ -35,6 +35,8 @@ void execute_input(char **args)
 	{
 		exitt(args);
 	}
+	else
+		exit(2);
 	if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
