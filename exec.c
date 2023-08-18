@@ -33,9 +33,7 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		free(args[0]);
-		handle_exit(args);
-		return;
+		exitt(args);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{

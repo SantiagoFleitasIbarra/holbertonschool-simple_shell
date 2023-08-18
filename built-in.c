@@ -3,9 +3,20 @@
  * exitt - implement the builtin command
  * @args: string arrangement
 */
-void exitt(int status)
+void exitt(char **args)
 {
-	exit(status);
+	int n;
+
+	if (args[0] != 0)
+	{
+		n = _atoi(args[0]);
+		if (n <= -1)
+			n = 2;
+		free(args[0]);
+		exit(n);
+	}
+	free(args[0]);
+	exit(0);
 }
 /**
  * handle_cd - implement the builtin command
