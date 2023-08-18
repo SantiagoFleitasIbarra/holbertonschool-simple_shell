@@ -23,7 +23,10 @@ void execute_command(char **args)
 		while (!WIFEXITED(status) && !WIFSIGNALED(status));
 
 		if (WIFSIGNALED(status))
-			exit(EXIT_FAILURE);
+			status = 2;
+
+		if (WIFEXITED(status))
+			status = WEXITSTATUS(status);
 	}
 	else
 		perror("Fork failed");
@@ -36,7 +39,7 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		if (args[1])
+		/*if (args[1])
 		{
 			int n = atoi(args[1]);
 
@@ -44,9 +47,9 @@ void execute_input(char **args)
 				n = 2;
 			free(args[0]);
 			exit(n);
-		}
+		}*/
 		free(args[0]);
-		exit(0);
+		exit(EXIT_SUCCESS);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
