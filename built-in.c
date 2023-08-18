@@ -77,3 +77,24 @@ void handle_unsetenv(char **args)
 	if (unsetenv(args[1]) == -1)
 		fprintf(stderr, "Failed to unset environment variable: %s\n", args[1]);
 }
+/**
+ * exitt - implement the builtin command
+ * @args: string arrangement
+*/
+void exitt(char **args)
+{
+	if (args[1] != NULL)
+	{
+		int exit_status = atoi(args[1]);
+
+		if (exit_status <= -1)
+			exit_status = 2;
+		free(args[0]);
+		exit(exit_status);
+	}
+	else
+	{
+		free(args[0]);
+		exit(EXIT_SUCCESS);
+	}
+}
