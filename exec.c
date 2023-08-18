@@ -12,7 +12,7 @@ void execute_command(char **args)
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
-		exit(2);
+		exit(EXIT_FAILURE);
 	}
 	else if (pid > 0)
 	{
@@ -23,9 +23,7 @@ void execute_command(char **args)
 		while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	else
-	{
 		perror("Fork failed");
-	}
 }
 /**
  * execute_input - executes a command provided as an argument
@@ -35,8 +33,17 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
+		if (args[1])
+		{
+			int n = atoi(args[1]);
+
+			if (n < 0)
+				n = 2;
+			free(args[0]);
+			exit(n);
+		}
 		free(args[0]);
-		exit(EXIT_SUCCESS);
+		exit(0);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
@@ -125,9 +132,7 @@ char *_getenv(const char *name)
 	while (environ[i])
 	{
 		if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
-		{
 			return (&environ[i][len + 1]);
-		}
 		i++;
 	}
 	return (NULL);
@@ -157,4 +162,44 @@ char *_getenv(const char *name)
 		i++;
 	}
 	return (integer);
+}**/
+/***/
+/**void direct_execute(char **tokens, char *prog, int l_num)
+{
+	pid_t pid = fork();
+
+	if (access(tokens[0], X_OK) == -1)
+	{
+		fprintf(stderr, "%s: %d: %s: %s\n", prog, l_num, tokens[0], strerror(errno));
+		exit(127);
+	}
+	if (pid == 0)
+	{
+		execve(tokens[0], tokens, environ);
+
+		fprintf(stderr, "%s: %d: %s: %s\n", prog, l_num, tokens[0], strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	else if (pid > 0)
+	{
+		int status;
+
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+		{
+			int exit_status = WEXITSTATUS(status);
+
+			exit(exit_status);
+		}
+		else
+		{
+			fprintf(stderr, "Command did not exit normally\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		perror("Fork failed");
+		exit(EXIT_FAILURE);
+	}
 }**/
