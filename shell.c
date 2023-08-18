@@ -67,7 +67,8 @@ void handle_noninteractive_mode(FILE *input)
 
 		if (args[0] && strcmp(args[0], "exit") != 0)
 		{
-			fprintf(stderr, "%s: command not found\n", args[0]);
+			fprintf(stderr, "%s: cannot access '%s': No such file or directory\n", args[0], args[1]);
+			free(args[0]);
 			exit(2);
 		}
 		
