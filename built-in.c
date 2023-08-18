@@ -1,21 +1,26 @@
 # include "shell.h"
+
+#define EXIT_SUCCESS 0
+#define EXIT_ERROR 2
+
 /**
  * exitt - implement the builtin command
  * @args: string arrangement
 */
-void exitt(char **args)
+int exitt(char **args)
 {
-	int n;
+	int n = EXIT_SUCCESS;
 
 	if (args[1])
 	{
 		n = _atoi(args[1]);
-		if (n <= -1)
-			n = 2;
+		if (n < 0)
+			n = EXIT_SUCCESS;
+		free(args[0]);
 		exit(n);
 	}
 	free(args[0]);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 /**
  * handle_cd - implement the builtin command

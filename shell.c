@@ -25,13 +25,11 @@ int main(void)
 			line[strcspn(line, "\n")] = '\0';
 			tokenize_input(line, args);
 			if (args[0] != NULL)
-			{
 				execute_input(args);
-			}
 			free(line);
 		}
 	}
-	return (0);
+	return (EXIT_SUCCESS);
 }
 /**
  * tokenize_input - splits an input string into tokens
