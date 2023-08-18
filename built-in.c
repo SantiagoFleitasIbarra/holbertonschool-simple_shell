@@ -12,7 +12,6 @@ void exitt(char **args)
 		n = _atoi(args[1]);
 		if (n <= -1)
 			n = 2;
-		free(args[1]);
 		exit(n);
 	}
 	free(args[0]);

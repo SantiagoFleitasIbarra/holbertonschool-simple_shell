@@ -27,7 +27,6 @@ int main(void)
 			if (args[0] != NULL)
 			{
 				execute_input(args);
-				free(args[0]);
 			}
 			free(line);
 		}
