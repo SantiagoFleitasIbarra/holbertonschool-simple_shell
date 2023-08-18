@@ -18,10 +18,14 @@ void execute_command(char **args)
 	{
 		int status;
 
-		wait(&status);
+		do
+			waitpid(pid, &status, WUNTRACED);
+		while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	else
+	{
 		perror("Fork failed");
+	}
 }
 /**
  * execute_input - executes a command provided as an argument
@@ -31,8 +35,8 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		exitt(args);
-		exit(2);
+		free(args[0]);
+		exit(EXIT_SUCCESS);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
@@ -133,7 +137,7 @@ char *_getenv(const char *name)
  * @str: pointer to a string
  * Return: the integer
 */
-int _atoi(const char *str)
+/**int _atoi(const char *str)
 {
 	int i, integer, sign = 1;
 
@@ -153,4 +157,4 @@ int _atoi(const char *str)
 		i++;
 	}
 	return (integer);
-}
+}**/
