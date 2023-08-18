@@ -7,12 +7,12 @@ void exitt(char **args)
 {
 	int n;
 
-	if (args[0] != 0)
+	if (args[1])
 	{
-		n = _atoi(args[0]);
+		n = _atoi(args[1]);
 		if (n <= -1)
 			n = 2;
-		free(args[0]);
+		free(args[1]);
 		exit(n);
 	}
 	free(args[0]);
