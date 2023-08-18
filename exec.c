@@ -11,7 +11,6 @@ void execute_command(char **args)
 	{
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
-		/*perror(args[0]);*/
 		exit(EXIT_FAILURE);
 	}
 	else if (pid > 0)
@@ -80,7 +79,6 @@ void search_and_execute(char **args)
 		char *path_copy = strdup(path);
 		char *dir = strtok(path_copy, ":");
 
-
 		strcpy(path_copy, path);
 		while (dir)
 		{
@@ -97,9 +95,7 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		/*fprintf(stderr, "%s: command not found\n", args[0]);*/
-		fprintf(stderr, "./hsh: %d: %s: not found\n", 1, args[0]);
-		exit(127);
+		fprintf(stderr, "%s: command not found\n", args[0]);
 		free(path_copy);
 	}
 
