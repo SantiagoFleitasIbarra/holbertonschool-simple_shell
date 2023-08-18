@@ -11,7 +11,7 @@ void execute_command(char **args)
 	{
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
-		exit(2);
+		exit(127);
 	}
 	else if (pid > 0)
 	{
@@ -53,8 +53,6 @@ void execute_input(char **args)
 		handle_setenv(args);
 	else if (strcmp(args[0], "unsetenv") == 0)
 		handle_unsetenv(args);
-	else if (strcmp(args[0], "exit") != 0)
-		exit(2);
 	else
 	{
 		if (is_absolute_path(args[0]))

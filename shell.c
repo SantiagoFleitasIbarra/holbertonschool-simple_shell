@@ -65,6 +65,12 @@ void handle_noninteractive_mode(FILE *input)
 		line[strcspn(line, "\n")] = '\0';
 		tokenize_input(line, args);
 
+		if (args[0] && strcmp(args[0], "exit") != 0)
+		{
+			fprintf(stderr, "%s: command not found\n", args[0]);
+			exit(2);
+		}
+		
 		if (args[0] != NULL)
 		{
 			execute_input(args);
