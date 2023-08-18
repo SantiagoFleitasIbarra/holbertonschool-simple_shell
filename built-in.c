@@ -83,18 +83,16 @@ void handle_unsetenv(char **args)
 */
 void exitt(char **args)
 {
-	if (args[1] != NULL)
-	{
-		int exit_status = atoi(args[1]);
+	int n;
 
-		if (exit_status <= -1)
-			exit_status = 2;
-		free(args[0]);
-		exit(exit_status);
-	}
-	else
+	if (args[1])
 	{
+		n = _atoi(args[1]);
+		if (n <= -1)
+			n = 2;
 		free(args[0]);
-		exit(EXIT_SUCCESS);
+		exit(n);
 	}
+	free(args[0]);
+	exit(0);
 }
