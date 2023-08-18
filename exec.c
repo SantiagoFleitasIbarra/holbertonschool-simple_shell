@@ -32,11 +32,11 @@ void execute_input(char **args)
 	if (strcmp(args[0], "exit") == 0)
 	{
 		if (args[1] != NULL)
-			fprintf(stderr, "Usage: exit\n");
+			exit(2);
 		else
 		{
 			free(args[0]);
-			exit(EXIT_SUCCESS);
+			exit(0);
 		}
 	}
 	if (strcmp(args[0], "env") == 0)
