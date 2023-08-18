@@ -31,7 +31,7 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		if (args[1] != NULL)
+		if (args[0] != NULL)
 			exit(0);
 		else
 		{
