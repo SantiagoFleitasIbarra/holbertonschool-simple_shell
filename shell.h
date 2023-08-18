@@ -24,7 +24,7 @@ void handle_cd(char **args);
 void handle_help(void);
 void handle_setenv(char **args);
 void handle_unsetenv(char **args);
-/*int _atoi(const char *str);**/
-/*void exitt(char **args);*/
+int _atoi(const char *str);
+void exitt(char **args);
 /*void direct_execute(char **tokens, char *prog, int l_num);*/
 # endif
