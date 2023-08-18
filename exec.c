@@ -30,18 +30,7 @@ void execute_command(char **args)
 void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
-	{
-		if (args[1] != NULL)
-		{
-			fflush(stdout);
-			exit(2);
-		}
-		else
-		{
-			free(args[0]);
-			exit(EXIT_SUCCESS);
-		}
-	}
+		exitt(args);
 	if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
@@ -135,4 +124,25 @@ char *_getenv(const char *name)
 		i++;
 	}
 	return (NULL);
+}
+/***/
+int _atoi(const char *str)
+{
+	int result = 0;
+	int sign = 1;
+	int i = 0;
+
+	if (str[0] == '-')
+	{
+		sign = -1;
+		i = 1;
+	}
+	for (; str[i] != '\0'; ++i)
+	{
+		if (str[i] >= '0' && str[i] <= '9')
+			result = result * 10 + (str[i] - '0');
+		else
+			break;
+	}
+	return (result * sign);
 }
