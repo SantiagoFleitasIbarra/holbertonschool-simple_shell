@@ -31,8 +31,13 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		free(args[0]);
-		exit(2);
+		if (args[1] != NULL)
+			fprintf(stderr, "Usage: exit\n");
+		else
+		{
+			free(args[0]);
+			exit(EXIT_SUCCESS);
+		}
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
