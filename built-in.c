@@ -81,7 +81,7 @@ void handle_unsetenv(char **args)
  * exitt - implement the builtin command
  * @args: string arrangement
 */
-void exitt(char **args)
+/**void exitt(char **args)
 {
 	int n;
 
@@ -95,4 +95,4 @@ void exitt(char **args)
 	}
 	free(args[0]);
 	exit(0);
-}
+}**/
