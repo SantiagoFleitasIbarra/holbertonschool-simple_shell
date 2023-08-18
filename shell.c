@@ -25,7 +25,10 @@ int main(void)
 			line[strcspn(line, "\n")] = '\0';
 			tokenize_input(line, args);
 			if (args[0] != NULL)
+			{
 				execute_input(args);
+				free(args[0]);
+			}
 			free(line);
 		}
 	}
@@ -84,4 +87,13 @@ void handle_noninteractive_mode(FILE *input)
 int is_absolute_path(char *command)
 {
 	return (strchr(command, '/') != NULL);
+}
+/***/
+void handle_exit(char **args)
+{
+	int status = 0;
+
+	if (args[1] != NULL)
+		status = _atoi(args[1]);
+	exitt(status);
 }
