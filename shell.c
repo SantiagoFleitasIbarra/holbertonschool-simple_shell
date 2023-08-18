@@ -20,7 +20,7 @@ int main(void)
 			{
 				free(line);
 				printf("\n");
-				exit(EXIT_SUCCESS);
+				exit(2);
 			}
 			line[strcspn(line, "\n")] = '\0';
 			tokenize_input(line, args);
