@@ -12,7 +12,7 @@ void execute_command(char **args)
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
-		exitt(args);
+		exit(EXIT_FAILURE);
 	}
 	else if (pid > 0)
 	{
@@ -33,9 +33,9 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		/*if (args[1])
+		if (args[1])
 		{
-			int n = atoi(args[1]);
+			int n = _atoi(args[1]);
 
 			if (n <= 0)
 				n = 2;
@@ -43,8 +43,7 @@ void execute_input(char **args)
 			exit(n);
 		}
 		free(args[0]);
-		exit(EXIT_SUCCESS);*/
-		exitt(args);
+		exit(EXIT_SUCCESS);
 	}
 	if (strcmp(args[0], "env") == 0)
 	{
