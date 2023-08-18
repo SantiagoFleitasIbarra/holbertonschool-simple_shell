@@ -98,8 +98,6 @@ void search_and_execute(char **args)
 		}
 		/*fprintf(stderr, "%s: command not found\n", args[0]);*/
 		fprintf(stderr, "%s: %d: %s: not found\n", "./hsh", 1, args[0]);
-		exit(127);
-		free(args[0]);
 		free(path_copy);
 	}
 
