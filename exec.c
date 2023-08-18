@@ -35,8 +35,6 @@ void execute_input(char **args)
 	{
 		exitt(args);
 	}
-	if (strcmp(args[0], "exit") == 3)
-		exit(2);
 	if (strcmp(args[0], "env") == 0)
 	{
 		char **env = environ;
@@ -98,7 +96,9 @@ void search_and_execute(char **args)
 			}
 			dir = strtok(NULL, ":");
 		}
-		fprintf(stderr, "%s: command not found\n", args[0]);
+		/*fprintf(stderr, "%s: command not found\n", args[0]);*/
+		fprintf(stderr, "%s: %d: %s: not found\n", "./hsh", 1, args[0]);
+		exit(127);
 		free(path_copy);
 	}
 
