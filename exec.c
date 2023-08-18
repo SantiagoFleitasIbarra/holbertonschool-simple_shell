@@ -31,12 +31,15 @@ void execute_input(char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-		if (args[0] != NULL)
-			exit(0);
+		if (args[1] != NULL)
+		{
+			fflush(stdout);
+			exit(2);
+		}
 		else
 		{
 			free(args[0]);
-			exit(2);
+			exit(EXIT_SUCCESS);
 		}
 	}
 	if (strcmp(args[0], "env") == 0)
