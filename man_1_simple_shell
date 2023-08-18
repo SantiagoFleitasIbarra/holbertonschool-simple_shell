@@ -1,1 +1,56 @@
-textt
+.TH SHELL "18/8/2023" GNU "Simple shell man"
+.SH NAME
+.B hsh
+- Command line interpreter
+.SH SYNOPSIS
+The shell is executed by typing ./hsh
+.br
+Then, it will wait for an input such as : command [arguments] [other]
+.SH DESCRIPTION
+Shell is a command language interpreter that executes commands read from the standard input or from a file.
+.br
+.B What hsh can do :
+.br
+- Executes any command with its arguments
+.br
+- Executes built-in commands
+.SH BUILT-IN FUNCTIONS
+Those are the available built-in functions :
+.br
+ - exit : exit the shell
+.br
+ - cd : Change Directory
+.br
+ - help : Display the help page
+.br
+ - env : Display the environment variables
+.SH OPTIONS
+There are no options for the moment.
+.SH EXIT STATUS
+The exit value depends on how a function has terminated.
+.SH RETURN VALUE
+Return 0 on success, otherwise it will return the exit value.
+.SH ENVIRONMENT
+- PATH
+.SH EXAMPLE
+.B Two ways to execute our shell :
+.br
+.B The intercative mode :
+.br
+ $ ./hsh
+.br
+ #cisfun$ /bin/ls
+.br
+ hsh shell.c shell.h prompt.c exec.c
+.br
+ #cisfun$ exit
+.br
+ $
+.br
+.B The non-interactive mode :
+.br
+ $ echo "/bin/ls" | ./hsh
+.br
+ hsh shell.c shell.h prompt.c exec.c
+.SH AUTHORS
+Agustina Araujo, Santiago Fleitas
