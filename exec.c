@@ -12,7 +12,7 @@ void execute_command(char **args)
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
-		exit(EXIT_FAILURE);
+		exit(127);
 	}
 	else if (pid > 0)
 	{
