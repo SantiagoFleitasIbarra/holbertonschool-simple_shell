@@ -12,7 +12,7 @@ void execute_command(char **args)
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
 		/*perror(args[0]);*/
-		exit(2);
+		exit(EXIT_FAILURE);
 	}
 	else if (pid > 0)
 	{
@@ -23,7 +23,7 @@ void execute_command(char **args)
 		while (!WIFEXITED(status) && !WIFSIGNALED(status));
 
 		if (WIFSIGNALED(status))
-			exit(2);
+			exit(EXIT_FAILURE);
 	}
 	else
 		perror("Fork failed");
@@ -40,7 +40,7 @@ void execute_input(char **args)
 		{
 			int n = atoi(args[1]);
 
-			if (n < 0)
+			if (n <= 0)
 				n = 2;
 			free(args[0]);
 			exit(n);
