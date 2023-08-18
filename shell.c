@@ -65,13 +65,7 @@ void handle_noninteractive_mode(FILE *input)
 		line[strcspn(line, "\n")] = '\0';
 		tokenize_input(line, args);
 
-		if (args[0] && strcmp(args[0], "exit") != 0)
-		{
-			fprintf(stderr, "%s: cannot access '%s': No such file or directory\n", args[0], args[1]);
-			free(args[0]);
-			exit(2);
-		}
-		
+
 		if (args[0] != NULL)
 		{
 			execute_input(args);

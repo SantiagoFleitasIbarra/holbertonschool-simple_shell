@@ -11,7 +11,7 @@ void execute_command(char **args)
 	{
 		execve(args[0], args, environ);
 		fprintf(stderr, "%s: %s\n", args[0], strerror(errno));
-		exit(127);
+		exit(-1);
 	}
 	else if (pid > 0)
 	{
