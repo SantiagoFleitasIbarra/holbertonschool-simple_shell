@@ -65,7 +65,6 @@ void handle_noninteractive_mode(FILE *input)
 		line[strcspn(line, "\n")] = '\0';
 		tokenize_input(line, args);
 
-
 		if (args[0] != NULL)
 		{
 			execute_input(args);
