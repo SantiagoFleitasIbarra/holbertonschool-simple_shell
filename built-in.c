@@ -6,6 +6,7 @@
 /**
  * exitt - implement the builtin command
  * @args: string arrangement
+ * Return: EXIT_SUCCESS
 */
 int exitt(char **args)
 {
