@@ -21,7 +21,7 @@ A Unix shell is a command-line interpreter or shell that provides a command line
 | `help` | Print a help messages for built-ins |
 
 ## Functions
-* shell.c: It contains the main loop of our shell program. In addition to several auxiliary functions, for example: ```tokenize_input``` splits an input string into tokens. The non-interactive mode implementation. And finally a function that is used to determine if a string represents an absolute path in the file system.
+* shell.c: It contains the main loop of our shell program. In addition to several auxiliary functions, for example: /tokenize_input/ splits an input string into tokens. The non-interactive mode implementation. And finally a function that is used to determine if a string represents an absolute path in the file system.
 * shell.h: This is the header file containing the necessary libraries, macro definitions and function prototypes required for our shell.
 * prompt.c: It is used to display the prompt indicator in the shell interface. The prompt is the string of characters that appears before the user enters a command on the command line.
 * exec.c: It contains external and internal command execution handling. In addition, it also looks for a command in the PATH locations. Finally, it also contains some useful functions.
